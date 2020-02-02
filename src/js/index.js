@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/searchView';
+import * as recipeView from './views/recipeView';
 import { elements, clearLoader, renderLoader } from './views/base';
 
 /** Global state of the app
@@ -57,7 +58,6 @@ elements.searchResPages.addEventListener('click', e => {
 });
 
 
-
 /** 
  * RECIPE CONTROLLER
  */
@@ -68,6 +68,13 @@ const controlRecipe = async () => {
 
   if (id) {
     // prepare UI for changes
+    recipeView.clearRecipe();
+    renderLoader(elements.recipe);
+
+    //highlight active recipe
+    if (state.search) {
+      searchView.highlightSelected(id);
+    }
 
     // create new recipe object
     state.recipe = new Recipe(id);
@@ -75,7 +82,6 @@ const controlRecipe = async () => {
     try {
       // get recipe data and parse ingredients
       await state.recipe.getRecipe();
-      console.log(state.recipe.ingredients);
       state.recipe.parseIngredients();
 
       // calculate serving and time
@@ -83,7 +89,8 @@ const controlRecipe = async () => {
       state.recipe.calcServings();
 
       // render recipe
-      console.log(state.recipe);
+      clearLoader();
+      recipeView.renderRecipe(state.recipe);
     } catch (err) {
       alert('Error processing recipe.');
     }
@@ -91,3 +98,20 @@ const controlRecipe = async () => {
 };
 
 ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
+
+// handling recipe button clicks
+elements.recipe.addEventListener('click', e => {
+  console.log('click')
+  if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+    // decrease button is clicked
+    if (state.recipe.servings > 1) {
+      state.recipe.updateServings('dec');
+      recipeView.updateServingsIngredients(state.recipe);
+    }
+  } else if (e.target.matches('.btn-increase, .btn-increase *')) {
+    // increase button is clicked
+    state.recipe.updateServings('inc');
+    recipeView.updateServingsIngredients(state.recipe);
+  }
+  console.log(state.recipe);
+})
