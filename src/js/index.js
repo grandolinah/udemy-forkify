@@ -15,7 +15,6 @@ import { elements, clearLoader, renderLoader } from './views/base';
  * - Liked recipes
  */
 const state = {};
-window.state = state;
 
 /** 
  * SEARCH CONTROLLER
@@ -99,7 +98,6 @@ const controlRecipe = async () => {
         state.likes.isLiked(id)
       );
     } catch (err) {
-      console.log(err);
       alert('Error processing recipe.');
     }
   }
@@ -119,7 +117,7 @@ const controlList = () => {
   // add each ingredient to the list
   state.recipe.ingredients.forEach(el => {
     const item = state.list.addItem(el.count, el.unit, el.ingredient);
-    console.log(state.list)
+
     listView.renderItem(item);
   });
 };
@@ -161,7 +159,8 @@ const controlLike = () => {
       state.recipe.title,
       state.recipe.author,
       state.recipe.image
-    )
+    );
+
     // toggle the like button
     likesView.toggleLikeBtn(true);
 
